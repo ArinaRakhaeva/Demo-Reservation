@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<head>
+    <title>Machines</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <link type="text/css" rel="stylesheet" href="css/bootstrap.min.css" th:href="@{css/bootstrap.min.css}" />
+   </head>
+<body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+<div class="container">
+	<div class="col-md-4">
+		<h1>Machines</h1>
+	</div>
+	<div class="col-md-4">
+		<h3 th:inline="text">Welcome [[${#httpServletRequest.remoteUser}]]</h3>
+	</div>
+	<div class="col-md-4" style="padding:20px 0">
+		<form th:action="@{/logout}" method="post">
+			<input type="submit" value="Sign Out" class="btn btn-sm btn-danger"/>
+		</form>
+	</div>
+    <table class="table table-striped">
+<tr>
+<th></th>
+<th><button>washing machine 1</button></th>
+<th><button>washing machine 2</button></th>
+<th><button>washing machine 3</button></th>
+<th sec:authorize="hasAuthority('ADMIN')"></th>
+<th sec:authorize="hasAuthority('USER')"></th>
+</tr>
+<tr>
+<th> 9:00</th>
+<th><button id='0_0'><span th:text='${temp0}'></span></button></th>
+<th><button id='1_0'><span th:text='${temp1}'></span></button></th>
+<th><button id='2_0'><span th:text='${temp2}'></span></button></th>
+</tr>
+<tr>
+<th>12:00</th>
+<th><button id='0_1'><span th:text='${temp3}'></span></button></th>
+<th><button id='1_1'><span th:text='${temp4}'></span></button></th>
+<th><button id='2_1'><span th:text='${temp5}'></span></button></th>
+</tr>
+<tr>
+<th>21:00</th>
+<th><button id='0_2'><span th:text='${temp6}'></span></button></th>
+<th><button id='1_2'><span th:text='${temp7}'></span></button></th>
+<th><button id='2_2'><span th:text='${temp8}'></span></button></th>
+</tr>
+</table>
+</div>
+
+<script type="text/javascript">
+//double cycle to get all buttons
+	for (var i = 0; i < 3; ++i) {
+		for (var j = 0; j < 3; ++j) {
+			//button's id
+			const id = "" + i + "_" + j;
+			console.log(id);
+			//button's subject
+			const button = document.getElementById(id);
+			const local_time = j
+			const local_machine = i
+			//function on click
+			button.addEventListener('click', async _ => {
+				try {
+					//send time,machine's number, user
+			    	const response = axios.post('http://localhost:8080/reservation', 
+		    		{ 
+		    			time : local_time,
+		    			machine : local_machine,
+		    			name : '[[${#httpServletRequest.remoteUser}]]' 
+		    		},
+		    		{
+	       				headers: {  'Content-Type': 'application/json;charset=UTF-8',
+	          						"Access-Control-Allow-Origin": "*", }
+	      			});
+	      			 
+	    			console.log('Completed!', response);
+	    			//reloading the page to get an answer
+	    			document.location.reload(true);
+	  			} catch(err) {
+	    			console.error(`Error: ${err}`);
+	  			}
+			});
+		}
+	}
+</script>
+</body>
+</html>
